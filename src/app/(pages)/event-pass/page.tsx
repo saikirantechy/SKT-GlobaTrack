@@ -168,8 +168,8 @@ export default function EventPassPage() {
                       <Globe className="size-8"/>
                       <h2 className="text-2xl font-headline font-bold">SKT GlobaTrack</h2>
                    </div>
-                  <Image src="https://placehold.co/128x128.png" data-ai-hint="profile picture" alt="Profile" width={128} height={128} className="rounded-full border-4 border-white shadow-lg -mt-2" />
-                  <h3 className="mt-4 text-3xl font-headline font-semibold text-primary-foreground-from-card">{passDetails.name}</h3>
+                  <Image src="https://placehold.co/128x128.png" data-ai-hint="cartoon avatar" alt="Profile" width={128} height={128} className="rounded-full border-4 border-white shadow-lg -mt-2" />
+                  <h3 className="mt-4 text-3xl font-headline font-semibold text-primary">{passDetails.name}</h3>
                   <p className="text-lg text-muted-foreground">{passDetails.role}</p>
 
                   <div className="my-6 w-full">
