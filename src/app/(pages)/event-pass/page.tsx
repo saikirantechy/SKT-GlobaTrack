@@ -17,10 +17,11 @@ import { Loader2, Sparkles, Globe, QrCode } from "lucide-react"
 const formSchema = z.object({
   attendeeName: z.string().min(2, "Name must be at least 2 characters."),
   role: z.enum(["Attendee", "Volunteer", "Speaker"]),
+  gender: z.enum(["Male", "Female", "Other", "Prefer not to say"]),
   languagePreference: z.string().min(2, "Please select a language."),
 })
 
-type PassDetails = GenerateEventPassDetailsOutput & { name: string, role: string };
+type PassDetails = GenerateEventPassDetailsOutput & { name: string, role: string, gender: string };
 
 const readFileAsDataURL = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -43,6 +44,7 @@ export default function EventPassPage() {
     defaultValues: {
       attendeeName: "",
       role: "Attendee",
+      gender: "Prefer not to say",
       languagePreference: "en",
     },
   })
@@ -59,7 +61,7 @@ export default function EventPassPage() {
       
       const result = await generateEventPassDetails(values)
       if (result) {
-        setPassDetails({ ...result, name: values.attendeeName, role: values.role })
+        setPassDetails({ ...result, name: values.attendeeName, role: values.role, gender: values.gender })
         setPassPhoto(photoUrl)
       } else {
          toast({
@@ -157,6 +159,29 @@ export default function EventPassPage() {
                 />
                 <FormField
                   control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Gender</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select your gender" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Male">Male</SelectItem>
+                          <SelectItem value="Female">Female</SelectItem>
+                          <SelectItem value="Other">Other</SelectItem>
+                          <SelectItem value="Prefer not to say">Prefer not to say</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="languagePreference"
                   render={({ field }) => (
                     <FormItem>
@@ -210,6 +235,9 @@ export default function EventPassPage() {
                   />
                   <h3 className="mt-4 text-3xl font-headline font-semibold text-primary">{passDetails.name}</h3>
                   <p className="text-lg text-muted-foreground">{passDetails.role}</p>
+                  {passDetails.gender !== "Prefer not to say" && (
+                    <p className="text-md text-muted-foreground">{passDetails.gender}</p>
+                  )}
 
                   <div className="my-4 w-full border-t border-dashed pt-4">
                     <p className="text-sm font-semibold mb-1">Event Details</p>

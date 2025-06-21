@@ -68,13 +68,13 @@ export default function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <header>
+      <header className="animate-in fade-in slide-in-from-bottom-4 duration-500">
         <h1 className="text-4xl font-headline font-bold text-primary">Smart Event Dashboard</h1>
         <p className="text-muted-foreground font-body text-lg">Real-time event intelligence at your fingertips.</p>
       </header>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+        <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '100ms' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Event Capacity</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -85,7 +85,7 @@ export default function DashboardPage() {
             <Progress value={occupancyPercentage} className="mt-4" />
           </CardContent>
         </Card>
-        <Card>
+        <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '200ms' }}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">On Waitlist</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
@@ -95,7 +95,7 @@ export default function DashboardPage() {
             <p className="text-xs text-muted-foreground">people waiting for a spot</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '300ms' }}>
            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Room Occupancy</CardTitle>
             <Building className="h-4 w-4 text-muted-foreground" />
@@ -115,7 +115,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
-        <Card className="lg:col-span-3">
+        <Card className="lg:col-span-3 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '400ms' }}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" /> Attendee Distribution</CardTitle>
             <CardDescription>Attendees from different areas in Bangalore</CardDescription>
@@ -139,7 +139,7 @@ export default function DashboardPage() {
             </ChartContainer>
           </CardContent>
         </Card>
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '500ms' }}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><PersonStanding className="h-5 w-5" /> Gender Diversity</CardTitle>
           </CardHeader>
@@ -157,7 +157,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
-       <Card>
+       <Card className="animate-in fade-in slide-in-from-bottom-4 duration-500" style={{ animationDelay: '600ms' }}>
         <CardHeader>
             <CardTitle className="flex items-center gap-2"><LanguageIcon className="h-5 w-5" /> Language Diversity</CardTitle>
             <CardDescription>Primary languages spoken by attendees</CardDescription>

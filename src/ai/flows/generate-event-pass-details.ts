@@ -11,13 +11,14 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const GenerateEventPassDetailsInputSchema = z.object({
+  attendeeName: z.string().describe('The name of the attendee.'),
   role: z
     .enum(['Attendee', 'Volunteer', 'Speaker'])
     .describe('The role of the attendee.'),
   languagePreference: z
     .string()
     .describe('The preferred language of the attendee.'),
-  attendeeName: z.string().describe('The name of the attendee.'),
+  gender: z.string().describe('The gender of the attendee.'),
 });
 
 export type GenerateEventPassDetailsInput = z.infer<
@@ -45,9 +46,10 @@ const prompt = ai.definePrompt({
   output: {schema: GenerateEventPassDetailsOutputSchema},
   prompt: `You are an event pass generator. You will generate event pass details and a color code based on the attendee's role and language preferences.
 
+Attendee Name: {{{attendeeName}}}
 Role: {{{role}}}
 Language Preference: {{{languagePreference}}}
-Attendee Name: {{{attendeeName}}}
+Gender: {{{gender}}}
 
 Consider the following:
 - If the role is Volunteer, the details should include the volunteer duties and the color code should be green.
