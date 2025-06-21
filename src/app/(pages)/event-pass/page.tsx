@@ -210,7 +210,12 @@ export default function EventPassPage() {
                   <h3 className="mt-4 text-3xl font-headline font-semibold text-primary">{passDetails.name}</h3>
                   <p className="text-lg text-muted-foreground">{passDetails.role}</p>
 
-                  <div className="my-6 w-full">
+                  <div className="my-4 w-full border-t border-dashed pt-4">
+                    <p className="text-sm font-semibold mb-1">Event Details</p>
+                    <p className="text-sm text-muted-foreground">Today only</p>
+                  </div>
+
+                  <div className="mb-6 w-full">
                     <p className="text-sm font-semibold mb-2">Details:</p>
                     <p className="text-sm text-muted-foreground">{passDetails.details}</p>
                   </div>
