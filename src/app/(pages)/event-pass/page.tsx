@@ -12,7 +12,9 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Sparkles, Globe, QrCode } from "lucide-react"
+import { Loader2, Sparkles, QrCode } from "lucide-react"
+import { SktLogoIcon } from "@/components/skt-logo-icon"
+import { FirebaseLogo } from "@/components/firebase-logo"
 
 const formSchema = z.object({
   attendeeName: z.string().min(2, "Name must be at least 2 characters."),
@@ -221,10 +223,13 @@ export default function EventPassPage() {
             <Card className={`w-full max-w-sm rounded-2xl border-2 shadow-2xl ${getPassColor(passDetails.colorCode)}`}>
               <CardContent className="p-6">
                 <div className="flex flex-col items-center text-center">
-                   <div className="flex items-center gap-2 text-primary mb-4">
-                      <Globe className="size-8"/>
-                      <h2 className="text-2xl font-headline font-bold">Google Event</h2>
-                   </div>
+                   <div className="flex w-full justify-between items-center mb-4">
+                        <div className="flex items-center gap-2 text-primary">
+                            <SktLogoIcon className="size-8"/>
+                            <h2 className="text-xl md:text-2xl font-headline font-bold">SKT GlobaTrack</h2>
+                        </div>
+                        <FirebaseLogo className="size-10" />
+                    </div>
                   <Image 
                     src={passPhoto} 
                     alt="Profile" 

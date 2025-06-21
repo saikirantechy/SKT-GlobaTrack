@@ -15,8 +15,8 @@ import {
   QrCode,
   Languages,
   MessageSquareHeart,
-  Globe,
 } from "lucide-react";
+import { SktLogoIcon } from "./skt-logo-icon";
 
 export function AppSidebar() {
   const pathname = usePathname();
@@ -48,8 +48,8 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2">
-          <Globe className="size-8 text-primary" />
-          <h1 className="text-xl font-headline font-semibold">Google Event</h1>
+          <SktLogoIcon className="size-8" />
+          <h1 className="text-xl font-headline font-semibold">SKT GlobaTrack</h1>
         </div>
       </SidebarHeader>
       <SidebarContent>
