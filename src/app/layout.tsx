@@ -3,8 +3,8 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 
 export const metadata: Metadata = {
-  title: 'SKT GlobaTrack',
-  description: 'SKT GlobaTrack Event Management Platform',
+  title: 'Google Event - Bangalore',
+  description: 'Google Event Management Platform - Bangalore',
 };
 
 export default function RootLayout({

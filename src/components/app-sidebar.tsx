@@ -49,7 +49,7 @@ export function AppSidebar() {
       <SidebarHeader>
         <div className="flex items-center gap-2">
           <Globe className="size-8 text-primary" />
-          <h1 className="text-xl font-headline font-semibold">SKT GlobaTrack</h1>
+          <h1 className="text-xl font-headline font-semibold">Google Event</h1>
         </div>
       </SidebarHeader>
       <SidebarContent>

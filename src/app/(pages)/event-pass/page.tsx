@@ -198,7 +198,7 @@ export default function EventPassPage() {
                 <div className="flex flex-col items-center text-center">
                    <div className="flex items-center gap-2 text-primary mb-4">
                       <Globe className="size-8"/>
-                      <h2 className="text-2xl font-headline font-bold">SKT GlobaTrack</h2>
+                      <h2 className="text-2xl font-headline font-bold">Google Event</h2>
                    </div>
                   <Image 
                     src={passPhoto} 
@@ -206,13 +206,14 @@ export default function EventPassPage() {
                     width={128} 
                     height={128} 
                     className="rounded-full border-4 border-white shadow-lg -mt-2 aspect-square object-cover" 
+                    data-ai-hint="avatar cartoon"
                   />
                   <h3 className="mt-4 text-3xl font-headline font-semibold text-primary">{passDetails.name}</h3>
                   <p className="text-lg text-muted-foreground">{passDetails.role}</p>
 
                   <div className="my-4 w-full border-t border-dashed pt-4">
                     <p className="text-sm font-semibold mb-1">Event Details</p>
-                    <p className="text-sm text-muted-foreground">Today only</p>
+                    <p className="text-sm text-muted-foreground">Bangalore • Today only</p>
                   </div>
 
                   <div className="mb-6 w-full">

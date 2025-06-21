@@ -7,13 +7,13 @@ import { Bar, BarChart, CartesianGrid, XAxis, Pie, PieChart, Cell } from "rechar
 import { Users, MapPin, Building, Languages as LanguageIcon, PersonStanding } from "lucide-react"
 
 const regionalData = [
-  { state: "Maharashtra", attendees: 125 },
-  { state: "Karnataka", attendees: 98 },
-  { state: "Delhi", attendees: 75 },
-  { state: "Tamil Nadu", attendees: 68 },
-  { state: "Telangana", attendees: 62 },
-  { state: "West Bengal", attendees: 45 },
-  { state: "Others", attendees: 112 },
+  { area: "Koramangala", attendees: 150 },
+  { area: "Indiranagar", attendees: 110 },
+  { area: "HSR Layout", attendees: 95 },
+  { area: "Whitefield", attendees: 80 },
+  { area: "Marathahalli", attendees: 70 },
+  { area: "Electronic City", attendees: 50 },
+  { area: "Others", attendees: 30 },
 ]
 
 const genderData = [
@@ -117,15 +117,15 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" /> Regional Diversity</CardTitle>
-            <CardDescription>Attendees from Indian states</CardDescription>
+            <CardTitle className="flex items-center gap-2"><MapPin className="h-5 w-5" /> Attendee Distribution</CardTitle>
+            <CardDescription>Attendees from different areas in Bangalore</CardDescription>
           </CardHeader>
           <CardContent>
             <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
               <BarChart accessibilityLayer data={regionalData} margin={{ top: 20, right: 20, bottom: 5, left: 5 }}>
                 <CartesianGrid vertical={false} />
                 <XAxis
-                  dataKey="state"
+                  dataKey="area"
                   tickLine={false}
                   tickMargin={10}
                   axisLine={false}
