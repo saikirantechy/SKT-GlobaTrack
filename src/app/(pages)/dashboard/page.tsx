@@ -17,17 +17,17 @@ const regionalData = [
 ]
 
 const genderData = [
-  { name: 'Male', value: 385, fill: 'var(--color-male)' },
-  { name: 'Female', value: 185, fill: 'var(--color-female)' },
-  { name: 'Other', value: 15, fill: 'var(--color-other)' },
+  { name: 'Male', value: 385, fill: 'var(--color-Male)' },
+  { name: 'Female', value: 185, fill: 'var(--color-Female)' },
+  { name: 'Other', value: 15, fill: 'var(--color-Other)' },
 ]
 
 const languageData = [
-    { name: 'English', value: 450, fill: 'var(--color-english)' },
-    { name: 'Hindi', value: 280, fill: 'var(--color-hindi)' },
-    { name: 'Marathi', value: 120, fill: 'var(--color-marathi)' },
-    { name: 'Kannada', value: 90, fill: 'var(--color-kannada)' },
-    { name: 'Other', value: 150, fill: 'var(--color-other-lang)' },
+    { name: 'English', value: 450, fill: 'var(--color-English)' },
+    { name: 'Hindi', value: 280, fill: 'var(--color-Hindi)' },
+    { name: 'Marathi', value: 120, fill: 'var(--color-Marathi)' },
+    { name: 'Kannada', value: 90, fill: 'var(--color-Kannada)' },
+    { name: 'Other-Lang', value: 150, fill: 'var(--color-Other-Lang)' },
 ]
 
 const chartConfig: ChartConfig = {
