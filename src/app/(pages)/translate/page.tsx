@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { translateSpeech } from "@/ai/flows/translate-speech";
+import { translate } from "@/ai/flows/translate-speech";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Mic, MicOff, Volume2, Loader2, AlertCircle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Mic, MicOff, Volume2, Loader2, AlertCircle, FileText, Languages } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const languages = [
@@ -23,14 +25,20 @@ const languages = [
 
 export default function TranslatePage() {
   const { toast } = useToast();
-  const [isRecording, setIsRecording] = useState(false);
-  const [translation, setTranslation] = useState("");
-  const [originalText, setOriginalText] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [targetLanguage, setTargetLanguage] = useState("es");
+
+  // Speech translation states
+  const [isRecording, setIsRecording] = useState(false);
+  const [speechTranslation, setSpeechTranslation] = useState("");
+  const [isSpeechTranslating, setIsSpeechTranslating] = useState(false);
   const [micPermission, setMicPermission] = useState<boolean | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
+  
+  // Text translation states
+  const [textToTranslate, setTextToTranslate] = useState("");
+  const [textTranslation, setTextTranslation] = useState("");
+  const [isTextTranslating, setIsTextTranslating] = useState(false);
 
   useEffect(() => {
     navigator.permissions.query({ name: 'microphone' as PermissionName }).then((permissionStatus) => {
@@ -46,8 +54,7 @@ export default function TranslatePage() {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       setMicPermission(true);
       setIsRecording(true);
-      setTranslation("");
-      setOriginalText("");
+      setSpeechTranslation("");
 
       mediaRecorderRef.current = new MediaRecorder(stream);
       audioChunksRef.current = [];
@@ -57,24 +64,20 @@ export default function TranslatePage() {
       };
 
       mediaRecorderRef.current.onstop = async () => {
-        setIsLoading(true);
+        setIsSpeechTranslating(true);
         const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const reader = new FileReader();
         reader.readAsDataURL(audioBlob);
         reader.onloadend = async () => {
           const base64data = reader.result as string;
           try {
-            // Note: `spokenLanguage` is auto-detected by the underlying model,
-            // so we can pass a generic value or the target language itself.
-            // For better accuracy, one might use a speech-to-text model first
-            // to identify the language, but this is sufficient for this demo.
-            const result = await translateSpeech({
+            const result = await translate({
               speechDataUri: base64data,
               targetLanguage: targetLanguage,
-              spokenLanguage: 'auto', 
+              sourceLanguage: 'auto', 
             });
             if (result.translation) {
-              setTranslation(result.translation);
+              setSpeechTranslation(result.translation);
             } else {
               toast({
                 variant: "destructive",
@@ -90,7 +93,7 @@ export default function TranslatePage() {
               description: "An error occurred during translation.",
             });
           } finally {
-            setIsLoading(false);
+            setIsSpeechTranslating(false);
           }
         };
       };
@@ -110,7 +113,6 @@ export default function TranslatePage() {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
       setIsRecording(false);
-      // Stop the media stream tracks to turn off the mic indicator
       mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
     }
   };
@@ -123,25 +125,57 @@ export default function TranslatePage() {
     }
   };
   
-  const speakTranslation = () => {
-    if (translation) {
-        const utterance = new SpeechSynthesisUtterance(translation);
+  const speakText = (text: string) => {
+    if (text) {
+        const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = targetLanguage;
         window.speechSynthesis.speak(utterance);
     }
   }
 
+  const handleTextTranslate = async () => {
+    if (!textToTranslate.trim()) return;
+    setIsTextTranslating(true);
+    setTextTranslation("");
+    try {
+      const result = await translate({
+        text: textToTranslate,
+        targetLanguage: targetLanguage,
+        sourceLanguage: 'auto',
+      });
+      if (result.translation) {
+        setTextTranslation(result.translation);
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Translation Failed",
+          description: "Could not get a translation. Please try again.",
+        });
+      }
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An error occurred during translation.",
+      });
+    } finally {
+      setIsTextTranslating(false);
+    }
+  };
+
+
   return (
     <div className="flex flex-col gap-8">
        <header>
         <h1 className="text-4xl font-headline font-bold text-primary">AI Language Translator</h1>
-        <p className="text-muted-foreground font-body text-lg">Speak and get instant translations. Powered by AI.</p>
+        <p className="text-muted-foreground font-body text-lg">Speak or type to get instant translations. Powered by AI.</p>
       </header>
 
       <Card className="max-w-2xl mx-auto w-full">
         <CardHeader>
           <CardTitle>Real-time Translation</CardTitle>
-          <CardDescription>Select a language, then press the mic to start speaking.</CardDescription>
+          <CardDescription>Select a target language and use either speech or text input.</CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center gap-6">
           <div className="w-full max-w-xs">
@@ -159,38 +193,75 @@ export default function TranslatePage() {
             </Select>
           </div>
 
-          {micPermission === false && (
-            <div className="flex items-center gap-2 text-destructive p-4 bg-destructive/10 rounded-md">
-                <AlertCircle className="h-5 w-5" />
-                <p>Microphone access is required. Please enable it in your browser settings.</p>
-            </div>
-          )}
+          <Tabs defaultValue="speech" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="speech"><Mic className="mr-2 h-4 w-4" /> Speech</TabsTrigger>
+              <TabsTrigger value="text"><FileText className="mr-2 h-4 w-4" /> Text</TabsTrigger>
+            </TabsList>
+            <TabsContent value="speech" className="mt-6">
+              <div className="flex flex-col items-center gap-4">
+                {micPermission === false && (
+                  <div className="flex items-center gap-2 text-destructive p-4 bg-destructive/10 rounded-md w-full">
+                      <AlertCircle className="h-5 w-5" />
+                      <p>Microphone access is required. Please enable it in your browser settings.</p>
+                  </div>
+                )}
 
-          <Button onClick={handleRecordClick} size="icon" className="w-24 h-24 rounded-full" disabled={micPermission === false}>
-            {isLoading ? (
-              <Loader2 className="h-10 w-10 animate-spin" />
-            ) : isRecording ? (
-              <MicOff className="h-10 w-10" />
-            ) : (
-              <Mic className="h-10 w-10" />
-            )}
-          </Button>
-          <p className="text-sm text-muted-foreground">
-            {isRecording ? "Recording... Click to stop." : "Tap to start recording."}
-          </p>
-          
-          {translation && (
-            <Card className="w-full bg-accent/20">
-                <CardContent className="p-4">
-                    <div className="flex justify-between items-center">
-                        <p className="text-lg font-semibold font-body text-accent-foreground">{translation}</p>
-                        <Button variant="ghost" size="icon" onClick={speakTranslation}>
+                <Button onClick={handleRecordClick} size="icon" className="w-24 h-24 rounded-full" disabled={micPermission === false}>
+                  {isSpeechTranslating ? (
+                    <Loader2 className="h-10 w-10 animate-spin" />
+                  ) : isRecording ? (
+                    <MicOff className="h-10 w-10" />
+                  ) : (
+                    <Mic className="h-10 w-10" />
+                  )}
+                </Button>
+                <p className="text-sm text-muted-foreground">
+                  {isRecording ? "Recording... Click to stop." : "Tap to start recording."}
+                </p>
+                
+                {speechTranslation && (
+                  <Card className="w-full bg-accent/20">
+                      <CardContent className="p-4">
+                          <div className="flex justify-between items-center">
+                              <p className="text-lg font-semibold font-body text-accent-foreground">{speechTranslation}</p>
+                              <Button variant="ghost" size="icon" onClick={() => speakText(speechTranslation)}>
+                                  <Volume2 className="h-5 w-5 text-accent-foreground"/>
+                              </Button>
+                          </div>
+                      </CardContent>
+                  </Card>
+                )}
+              </div>
+            </TabsContent>
+            <TabsContent value="text" className="mt-6">
+              <div className="flex flex-col gap-4">
+                <Textarea 
+                  placeholder="Type or paste text here to translate..."
+                  value={textToTranslate}
+                  onChange={(e) => setTextToTranslate(e.target.value)}
+                  className="min-h-[120px]"
+                />
+                <Button onClick={handleTextTranslate} disabled={isTextTranslating}>
+                  {isTextTranslating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Languages className="mr-2 h-4 w-4" />}
+                  Translate Text
+                </Button>
+
+                {textTranslation && (
+                  <Card className="w-full bg-accent/20">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-center">
+                        <p className="text-lg font-semibold font-body text-accent-foreground">{textTranslation}</p>
+                        <Button variant="ghost" size="icon" onClick={() => speakText(textTranslation)}>
                             <Volume2 className="h-5 w-5 text-accent-foreground"/>
                         </Button>
-                    </div>
-                </CardContent>
-            </Card>
-          )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
 
         </CardContent>
       </Card>

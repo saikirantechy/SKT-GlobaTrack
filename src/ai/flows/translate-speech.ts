@@ -1,58 +1,78 @@
-// This file is machine-generated - edit with caution!
-
 'use server';
 
 /**
- * @fileOverview Real-time speech translation flow.
+ * @fileOverview Real-time speech and text translation flow.
  *
- * - translateSpeech - A function that translates speech in real-time.
- * - TranslateSpeechInput - The input type for the translateSpeech function.
- * - TranslateSpeechOutput - The return type for the translateSpeech function.
+ * - translate - A function that translates speech or text in real-time.
+ * - TranslateInput - The input type for the translate function.
+ * - TranslateOutput - The return type for the translate function.
  */
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-const TranslateSpeechInputSchema = z.object({
-  spokenLanguage: z
-    .string()
-    .describe('The language of the spoken input. Use ISO language codes.'),
-  targetLanguage: z
-    .string()
-    .describe('The language to translate the spoken input to. Use ISO language codes.'),
-  speechDataUri: z
-    .string()
-    .describe(
-      'The spoken input as a data URI that must include a MIME type and use Base64 encoding. Expected format: data:<mimetype>;base64,<encoded_data>.'
-    ),
-});
-export type TranslateSpeechInput = z.infer<typeof TranslateSpeechInputSchema>;
+const TranslateInputSchema = z
+  .object({
+    sourceLanguage: z
+      .string()
+      .describe(
+        'The language of the input. Use ISO language codes. Use "auto" for auto-detection.'
+      ),
+    targetLanguage: z
+      .string()
+      .describe(
+        'The language to translate the input to. Use ISO language codes.'
+      ),
+    speechDataUri: z
+      .string()
+      .optional()
+      .describe(
+        'The spoken input as a data URI that must include a MIME type and use Base64 encoding. Expected format: data:<mimetype>;base64,<encoded_data>.'
+      ),
+    text: z.string().optional().describe('The text input to translate.'),
+  })
+  .refine(data => data.text || data.speechDataUri, {
+    message: 'Either text or speechDataUri must be provided.',
+  });
+export type TranslateInput = z.infer<typeof TranslateInputSchema>;
 
-const TranslateSpeechOutputSchema = z.object({
+const TranslateOutputSchema = z.object({
   translation: z.string().describe('The translated text.'),
-  media: z.string().optional().describe('The translated speech as audio data URI.'),
+  media: z
+    .string()
+    .optional()
+    .describe('The translated speech as audio data URI.'),
 });
-export type TranslateSpeechOutput = z.infer<typeof TranslateSpeechOutputSchema>;
+export type TranslateOutput = z.infer<typeof TranslateOutputSchema>;
 
-export async function translateSpeech(input: TranslateSpeechInput): Promise<TranslateSpeechOutput> {
-  return translateSpeechFlow(input);
+export async function translate(
+  input: TranslateInput
+): Promise<TranslateOutput> {
+  return translateFlow(input);
 }
 
-const translateSpeechPrompt = ai.definePrompt({
-  name: 'translateSpeechPrompt',
+const translatePrompt = ai.definePrompt({
+  name: 'translatePrompt',
   input: {
-    schema: TranslateSpeechInputSchema,
+    schema: TranslateInputSchema,
   },
   output: {
-    schema: TranslateSpeechOutputSchema,
+    schema: TranslateOutputSchema,
   },
-  prompt: `You are a real-time speech translator. A user will speak in their native language, and you will translate it into the target language.
+  prompt: `You are a real-time translator. A user will provide input in their native language, and you will translate it into the target language.
 
-  Spoken Language: {{{spokenLanguage}}}
+  Source Language: {{{sourceLanguage}}}
   Target Language: {{{targetLanguage}}}
-  Spoken Input: {{media url=speechDataUri}}
 
-  Translation:`, // Omit media URL from the output schema description
+  {{#if text}}
+  Text Input: {{{text}}}
+  {{/if}}
+
+  {{#if speechDataUri}}
+  Spoken Input: {{media url=speechDataUri}}
+  {{/if}}
+
+  Translation:`,
   config: {
     safetySettings: [
       {
@@ -75,15 +95,14 @@ const translateSpeechPrompt = ai.definePrompt({
   },
 });
 
-const translateSpeechFlow = ai.defineFlow(
+const translateFlow = ai.defineFlow(
   {
-    name: 'translateSpeechFlow',
-    inputSchema: TranslateSpeechInputSchema,
-    outputSchema: TranslateSpeechOutputSchema,
+    name: 'translateFlow',
+    inputSchema: TranslateInputSchema,
+    outputSchema: TranslateOutputSchema,
   },
   async input => {
-    const {output} = await translateSpeechPrompt(input);
+    const {output} = await translatePrompt(input);
     return output!;
   }
 );
-
