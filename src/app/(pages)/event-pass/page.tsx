@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Sparkles, Download, Globe, QrCode } from "lucide-react"
+import { Loader2, Sparkles, Globe, QrCode } from "lucide-react"
 
 const formSchema = z.object({
   attendeeName: z.string().min(2, "Name must be at least 2 characters."),
@@ -22,10 +22,21 @@ const formSchema = z.object({
 
 type PassDetails = GenerateEventPassDetailsOutput & { name: string, role: string };
 
+const readFileAsDataURL = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+};
+
 export default function EventPassPage() {
   const { toast } = useToast()
   const [passDetails, setPassDetails] = useState<PassDetails | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [passPhoto, setPassPhoto] = useState<string | null>(null)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,10 +50,17 @@ export default function EventPassPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     setPassDetails(null)
+    setPassPhoto(null)
     try {
+      let photoUrl = "https://placehold.co/128x128.png";
+      if (selectedFile) {
+          photoUrl = await readFileAsDataURL(selectedFile);
+      }
+      
       const result = await generateEventPassDetails(values)
       if (result) {
         setPassDetails({ ...result, name: values.attendeeName, role: values.role })
+        setPassPhoto(photoUrl)
       } else {
          toast({
             variant: "destructive",
@@ -101,6 +119,20 @@ export default function EventPassPage() {
                     </FormItem>
                   )}
                 />
+
+                <FormItem>
+                    <FormLabel>Profile Photo</FormLabel>
+                    <FormControl>
+                        <Input 
+                        type="file" 
+                        accept="image/*"
+                        onChange={(e) => setSelectedFile(e.target.files ? e.target.files[0] : null)}
+                        className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 cursor-pointer"
+                        />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+
                 <FormField
                   control={form.control}
                   name="role"
@@ -160,7 +192,7 @@ export default function EventPassPage() {
         </Card>
         
         <div className="flex items-center justify-center">
-          {passDetails ? (
+          {passDetails && passPhoto ? (
             <Card className={`w-full max-w-sm rounded-2xl border-2 shadow-2xl ${getPassColor(passDetails.colorCode)}`}>
               <CardContent className="p-6">
                 <div className="flex flex-col items-center text-center">
@@ -168,7 +200,13 @@ export default function EventPassPage() {
                       <Globe className="size-8"/>
                       <h2 className="text-2xl font-headline font-bold">SKT GlobaTrack</h2>
                    </div>
-                  <Image src="https://placehold.co/128x128.png" data-ai-hint="illustrated portrait" alt="Profile" width={128} height={128} className="rounded-full border-4 border-white shadow-lg -mt-2" />
+                  <Image 
+                    src={passPhoto} 
+                    alt="Profile" 
+                    width={128} 
+                    height={128} 
+                    className="rounded-full border-4 border-white shadow-lg -mt-2 aspect-square object-cover" 
+                  />
                   <h3 className="mt-4 text-3xl font-headline font-semibold text-primary">{passDetails.name}</h3>
                   <p className="text-lg text-muted-foreground">{passDetails.role}</p>
 
