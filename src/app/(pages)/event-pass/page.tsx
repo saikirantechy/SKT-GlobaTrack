@@ -12,7 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useToast } from "@/hooks/use-toast"
-import { Loader2, Sparkles, Download, Globe } from "lucide-react"
+import { Loader2, Sparkles, Download, Globe, QrCode } from "lucide-react"
 
 const formSchema = z.object({
   attendeeName: z.string().min(2, "Name must be at least 2 characters."),
